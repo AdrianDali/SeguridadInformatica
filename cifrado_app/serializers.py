@@ -49,3 +49,13 @@ class CifradoVernamSerializer(serializers.Serializer):
         if len(mensaje) != len(clave):
             raise serializers.ValidationError("La longitud del mensaje y la clave deben ser iguales.")
         return data
+
+class CifradoPlayfairSerializer(serializers.Serializer):
+    mensaje = serializers.CharField()
+    clave = serializers.CharField()
+
+    def validate(self, data):
+        clave = data.get('clave')
+        if not clave.isalpha():
+            raise serializers.ValidationError("La clave debe contener solo letras.")
+        return data

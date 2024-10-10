@@ -11,9 +11,8 @@ from .views import (
     DescifradoCesarView,
     CifradoVigenereView,
     DescifradoVigenereView,
-    
-    
-    
+    CifradoPlayfairView,
+    DescifradoPlayfairView,
 )
 
 
@@ -25,8 +24,7 @@ urlpatterns = [
     path('descifrado/cesar/', DescifradoCesarView.as_view(), name='descifrado_cesar'),
     path('cifrado/vigenere/', CifradoVigenereView.as_view(), name='cifrado_vigenere'),
     path('descifrado/vigenere/', DescifradoVigenereView.as_view(), name='descifrado_vigenere'),
-
     
-   
+    path('cifrado/playfair/', CifradoPlayfairView.as_view(), name='cifrado_playfair'),
+    path('descifrado/playfair/', DescifradoPlayfairView.as_view(), name='descifrado_playfair'),
 ]
-

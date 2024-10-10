@@ -80,25 +80,79 @@ def buscar_posicion(matriz, letra):
                 return i, j
     return None
 
-def preparar_texto(texto):
+
+############################################################3
+def generar_matriz_playfair(clave):
+    # Convertir la clave a mayúsculas
+    clave = clave.upper()
+    # Eliminar duplicados manteniendo el orden
+    clave_sin_duplicados = ''.join(sorted(set(clave), key=clave.index))
+    # Crear una lista de letras del alfabeto sin la letra 'J'
+    alfabeto = ''.join([chr(i) for i in range(ord('A'), ord('Z') + 1) if chr(i) != 'J'])
+    # Combinar la clave y el alfabeto, eliminando duplicados
+    letras_unicas = clave_sin_duplicados + ''.join([c for c in alfabeto if c not in clave_sin_duplicados])
+    # Crear la matriz de 5x5
+    matriz_final = [list(letras_unicas[i:i+5]) for i in range(0, 25, 5)]
+    return matriz_final
+
+def preparar_texto_playfair(texto):
     texto = texto.upper().replace('J', 'I')
-    texto = ''.join([c for c in texto if c in string.ascii_uppercase])
-    resultado = ''
+    texto = ''.join([c for c in texto if c.isalpha()])
+    pares = []
     i = 0
     while i < len(texto):
         a = texto[i]
         b = ''
-        if i + 1 < len(texto):
+        if (i + 1) < len(texto):
             b = texto[i + 1]
-        else:
-            b = 'X'
-        if a == b:
-            resultado += a + 'X'
-            i += 1
-        else:
-            resultado += a + b
+        if a != b:
+            pares.append(a + (b if b else 'X'))
             i += 2
-    if len(resultado) % 2 != 0:
-        resultado += 'X'
+        else:
+            pares.append(a + 'X')
+            i += 1
+    if len(pares[-1]) == 1:
+        pares[-1] += 'X'
+    return pares
+
+def encontrar_posicion(matriz, letra):
+    for row_idx, row in enumerate(matriz):
+        if letra in row:
+            return row_idx, row.index(letra)
+    return None, None
+
+def cifrar_playfair(mensaje, clave):
+    matriz = generar_matriz_playfair(clave)
+    pares = preparar_texto_playfair(mensaje)
+    resultado = ''
+    for par in pares:
+        fila1, col1 = encontrar_posicion(matriz, par[0])
+        fila2, col2 = encontrar_posicion(matriz, par[1])
+        if fila1 == fila2:
+            resultado += matriz[fila1][(col1 + 1) % 5]
+            resultado += matriz[fila2][(col2 + 1) % 5]
+        elif col1 == col2:
+            resultado += matriz[(fila1 + 1) % 5][col1]
+            resultado += matriz[(fila2 + 1) % 5][col2]
+        else:
+            resultado += matriz[fila1][col2]
+            resultado += matriz[fila2][col1]
     return resultado
 
+def descifrar_playfair(mensaje, clave):
+    matriz = generar_matriz_playfair(clave)
+    pares = [mensaje[i:i+2] for i in range(0, len(mensaje), 2)]
+    resultado = ''
+    for par in pares:
+        fila1, col1 = encontrar_posicion(matriz, par[0])
+        fila2, col2 = encontrar_posicion(matriz, par[1])
+        if fila1 == fila2:
+            resultado += matriz[fila1][(col1 - 1) % 5]
+            resultado += matriz[fila2][(col2 - 1) % 5]
+        elif col1 == col2:
+            resultado += matriz[(fila1 - 1) % 5][col1]
+            resultado += matriz[(fila2 - 1) % 5][col2]
+        else:
+            resultado += matriz[fila1][col2]
+            resultado += matriz[fila2][col1]
+    return resultado

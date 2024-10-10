@@ -7,7 +7,7 @@ from .serializers import (
     UserLoginSerializer,
     CifradoCesarSerializer,
     CifradoVigenereSerializer,
-
+    CifradoPlayfairSerializer,
 )
 
 from django.contrib.auth.models import User
@@ -16,8 +16,10 @@ from .utils import (
     cifrado_cesar,
     cifrado_vigenere,
     descifrado_vigenere,
-    
-)    
+    cifrar_playfair,
+    descifrar_playfair,
+)
+ 
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -86,3 +88,28 @@ class DescifradoVigenereView(APIView):
             return Response({'resultado': resultado})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+###########################################################################
+
+class CifradoPlayfairView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = CifradoPlayfairSerializer(data=request.data)
+        if serializer.is_valid():
+            mensaje = serializer.validated_data['mensaje']
+            clave = serializer.validated_data['clave']
+            resultado = cifrar_playfair(mensaje, clave)
+            return Response({'resultado': resultado})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DescifradoPlayfairView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = CifradoPlayfairSerializer(data=request.data)
+        if serializer.is_valid():
+            mensaje = serializer.validated_data['mensaje']
+            clave = serializer.validated_data['clave']
+            resultado = descifrar_playfair(mensaje, clave)
+            return Response({'resultado': resultado})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
